@@ -1,0 +1,361 @@
+{
+	"variables": [],
+	"info": {
+		"name": "BIG-IP non-admin AUTH",
+		"_postman_id": "7a9d9bed-7db9-72bd-cdfd-a785beb30cc1",
+		"description": "This collection has been created to show how non-admin users can leverage iControlREST within their own privledges",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Step 1: View all users",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/auth/user",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 2: Create non-admin user",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/auth/user",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n      \"name\": \"testuser\",\r\n      \"password\": \"test\",\r\n      \"partitionAccess\": [\r\n        {\r\n          \"name\": \"all-partitions\",\r\n          \"role\": \"operator\"\r\n        }\r\n      ]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 3: Check creation and get properties",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/shared/authz/users/testuser",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n      \"name\": \"testuser\",\r\n      \"password\": \"test\",\r\n      \"partitionAccess\": [\r\n        {\r\n          \"name\": \"all-partitions\",\r\n          \"role\": \"operator\"\r\n        }\r\n      ]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 4: Add user to iControl_REST_API_User group",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/shared/authz/roles/iControl_REST_API_User",
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userReferences\":[{\"link\": \"https://localhost/mgmt/shared/authz/users/testuser\"}]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5a: Test non-admin user",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/ltm",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdHVzZXI6dGVzdA==",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userReferences\":[{\"link\": \"https://localhost/mgmt/shared/authz/users/testuser\"}]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5b: Test non-admin user: Show Virtual Servers",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/ltm/virtual",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdHVzZXI6dGVzdA==",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userReferences\":[{\"link\": \"https://localhost/mgmt/shared/authz/users/testuser\"}]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5c: Test non-admin user: Show Pools",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/ltm/pool",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdHVzZXI6dGVzdA==",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userReferences\":[{\"link\": \"https://localhost/mgmt/shared/authz/users/testuser\"}]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5d: Test non-admin user: Show Node",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/ltm/node",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdHVzZXI6dGVzdA==",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userReferences\":[{\"link\": \"https://localhost/mgmt/shared/authz/users/testuser\"}]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 6: Show poolmembers to change state",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/ltm/pool/pool_http/members",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdHVzZXI6dGVzdA==",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userReferences\":[{\"link\": \"https://localhost/mgmt/shared/authz/users/testuser\"}]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 7: Select a poolmember to change state",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/ltm/pool/pool_http/members/~Common~10.128.20.11:80",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdHVzZXI6dGVzdA==",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userReferences\":[{\"link\": \"https://localhost/mgmt/shared/authz/users/testuser\"}]\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 8: Change poolmember state",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/ltm/pool/pool_http/members/~Common~10.128.20.11:80",
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic dGVzdHVzZXI6dGVzdA==",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"session\":\"user-enabled\",\r\n\"state\": \"user-down\"\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 9: Delete non-admin user",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/shared/authz/users/testuser",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"session\":\"user-enabled\",\r\n\"state\": \"user-down\"\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 10: Check if non-admin user is removed from iControl_REST_API_User group",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/shared/authz/roles/iControl_REST_API_User",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"session\":\"user-enabled\",\r\n\"state\": \"user-down\"\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Step 11: Check if non-admin user is removed",
+			"request": {
+				"url": "https://{{big_ip_a_mgmt}}/mgmt/tm/auth/user",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46YWRtaW4=",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"session\":\"user-enabled\",\r\n\"state\": \"user-down\"\r\n    }\r\n"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
